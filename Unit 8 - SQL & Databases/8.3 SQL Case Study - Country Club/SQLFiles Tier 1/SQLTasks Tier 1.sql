@@ -33,11 +33,13 @@ exploring the data, and getting acquainted with the 3 tables. */
 /* QUESTIONS 
 /* Q1: Some of the facilities charge a fee to members, but some do not.
 Write a SQL query to produce a list of the names of the facilities that do. */
+
 SELECT * 
 FROM Facilities 
 WHERE membercost >0;
 
 /* Q2: How many facilities do not charge a fee to members? */
+
 SELECT COUNT(name) 
 FROM Facilities 
 WHERE membercost = 0;
@@ -46,12 +48,14 @@ WHERE membercost = 0;
 where the fee is less than 20% of the facility's monthly maintenance cost.
 Return the facid, facility name, member cost, and monthly maintenance of the
 facilities in question. */
+
 SELECT facid, name, membercost, monthlymaintenance
 FROM Facilities 
 WHERE membercost >0 AND membercost < monthlymaintenance * 0.2;
 
 /* Q4: Write an SQL query to retrieve the details of facilities with ID 1 and 5.
 Try writing the query without using the OR operator. */
+
 SELECT * 
 FROM Facilities 
 WHERE facid IN (1,5);
@@ -72,6 +76,7 @@ FROM Facilities;
 
 /* Q6: You'd to get the first and last name of the last member(s)
 who signed up. Try not to use the LIMIT clause for your solution. */
+
 SELECT firstname, surname 
 FROM Members 
 ORDER BY joindate DESC;
@@ -80,6 +85,7 @@ ORDER BY joindate DESC;
 Include in your output the name of the court, and the name of the member
 formatted as a single column. Ensure no duplicate data, and order by
 the member name. */
+
 SELECT DISTINCT(CONCAT(m.firstname, ' ', m.surname)) AS fullname, f.name
 FROM Bookings AS b
 INNER JOIN Facilities AS f
@@ -108,6 +114,24 @@ ON b.facid = f.facid
 INNER JOIN Members AS m
 ON b.memid = m.memid
 WHERE b.starttime LIKE ('2012-09-14%')
+ORDER BY cost DESC;
+
+/* Below is the modified answer after the solusion was provided. */
+
+SELECT f.name, CONCAT(m.firstname, ' ', m.surname) AS fullname,
+CASE WHEN b.memid = 0 THEN f.guestcost * b.slots
+ELSE f.membercost * b.slots
+END
+AS cost 
+FROM Bookings AS b
+INNER JOIN Facilities AS f
+ON b.facid = f.facid
+INNER JOIN Members AS m
+ON b.memid = m.memid
+WHERE b.starttime LIKE ('2012-09-14%')
+AND CASE WHEN b.memid = 0 THEN f.guestcost * b.slots
+ELSE f.membercost * b.slots
+END > 30
 ORDER BY cost DESC;
 
 /* Q9: This time, produce the same result as in Q8, but using a subquery. */
@@ -176,7 +200,7 @@ FROM Members AS m
 INNER JOIN Members AS m1
 ON sub.rec_int = m1.memid
 WHERE sub.rec_int NOT IN (0)
-ORDER BY fullname;
+ORDER BY sub.surname, sub.firstname, m1.surname, m1.firstname;
 
 /* Q12: Find the facilities with their usage by member, but not guests */
 
